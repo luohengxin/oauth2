@@ -3,12 +3,14 @@ package com.cn.oauth.config;
 import com.cn.oauth.enhaner.MyTokenEnhancer;
 import com.cn.oauth.granter.EmailCodeTokenGranter;
 import com.cn.oauth.service.RedisTokenServices;
+import com.cn.oauth.service.SysUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -20,6 +22,7 @@ import org.springframework.security.oauth2.provider.client.ClientCredentialsToke
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeTokenGranter;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.implicit.ImplicitTokenGranter;
 import org.springframework.security.oauth2.provider.password.ResourceOwnerPasswordTokenGranter;
 import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter;
@@ -45,6 +48,9 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
     @Autowired
     private ClientDetailsService clientDetailsService;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
 
     @Bean
     public TokenStore tokenStore(){
@@ -59,10 +65,7 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
     }
 
 
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices(){
-        return new InMemoryAuthorizationCodeServices();
-    }
+
 
     @Bean
     public RedisTokenServices tokenServices(){
@@ -104,6 +107,11 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
         return tokenGranters;
     }
 
+    @Bean
+    public InMemoryAuthorizationCodeServices authorizationCodeServices(){
+        return new InMemoryAuthorizationCodeServices();
+    }
+
     /**
      通过 tokenGranter 塞进去的就是它了
      */
@@ -124,7 +132,6 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-
         clients.withClientDetails(clientDetailsService);
 
     }
@@ -133,11 +140,14 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
                 .tokenStore(tokenStore())
+                .userDetailsService(userDetailsService)
                 .tokenServices(tokenServices())
                 .tokenGranter(tokenGranter())
                 .tokenEnhancer(tokenEnhancer())
                 .authenticationManager(authenticationManager)
+                .authorizationCodeServices(authorizationCodeServices())
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
+                .pathMapping("/oauth/confirm_access","/auth/approve")
         ;
 
     }

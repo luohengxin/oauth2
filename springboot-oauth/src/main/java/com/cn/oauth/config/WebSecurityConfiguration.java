@@ -1,6 +1,7 @@
 package com.cn.oauth.config;
 
 
+import com.cn.oauth.common.PermitAllUrl;
 import com.cn.oauth.provider.EmailCodeProvider;
 import com.cn.oauth.service.SysClientDetailService;
 import com.cn.oauth.service.SysUserDetailService;
@@ -58,12 +59,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 
         http
                 //表单登录,loginPage为登录请求的url,loginProcessingUrl为表单登录处理的URL
-               /* .formLogin().loginPage("/auth/login").loginProcessingUrl("/auth/authorize")
-                .and()*/
-                //允许访问
-                .requestMatchers().antMatchers("/auth/login","/auth/authorize")
+                .formLogin().loginPage("/auth/login").loginProcessingUrl("/auth/authorize")
                 .and()
-                .authorizeRequests().antMatchers("/auth/login","/auth/authorize").permitAll()
+                //允许访问
+                .requestMatchers().antMatchers("/auth/login","/auth/authorize").anyRequest()
+                .and()
+                .authorizeRequests().antMatchers(PermitAllUrl.permitAllUrl("/auth/login","/auth/authorize")).permitAll()
                 .anyRequest().authenticated()
                 //禁用跨站伪造
                 .and()
