@@ -15,4 +15,9 @@ public class AuthPageController {
         return "/oauth/login";
     }
 
+    @RequestMapping("/approve")
+    public String approve() {
+        return "/oauth/approve";
+    }
+
 }
