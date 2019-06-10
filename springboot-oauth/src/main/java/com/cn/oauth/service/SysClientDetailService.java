@@ -25,10 +25,11 @@ public class SysClientDetailService implements ClientDetailsService {
             client.setClientId(clientId);
             client.setClientSecret( new BCryptPasswordEncoder().encode("123456"));
             //com.cn.client.setResourceIds(Arrays.asList("order"));
+            client.setScope(Arrays.asList("select","delete"));
+            //client.setAutoApproveScopes(Arrays.asList());
             client.setAuthorizedGrantTypes(Arrays.asList("authorization_code",
                     "client_credentials", "refresh_token", "password", "implicit","email_code"));
             //不同的client可以通过 一个scope 对应 权限集
-            client.setScope(Arrays.asList("all", "select"));
             client.setAuthorities(AuthorityUtils.createAuthorityList("admin_role"));
             client.setAccessTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(1)); //1天
             client.setRefreshTokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(1)); //1天
