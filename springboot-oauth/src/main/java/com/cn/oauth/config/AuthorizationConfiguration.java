@@ -160,7 +160,9 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
         //IntegrationAuthenticationFilter 采用 @Component 注入
         security.allowFormAuthenticationForClients()
                 .tokenKeyAccess("isAuthenticated()")
-                .checkTokenAccess("permitAll()");
+                .checkTokenAccess("permitAll()")
+                //.addTokenEndpointAuthenticationFilter(); //BasicAuthenticationFilter 前添加filter
+        ;
     }
 }
 

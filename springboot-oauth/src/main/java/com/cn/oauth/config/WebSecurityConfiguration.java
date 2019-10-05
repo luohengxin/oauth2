@@ -68,7 +68,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .anyRequest().authenticated()
                 //禁用跨站伪造
                 .and()
-                .csrf().disable();
+                .csrf()
+                .requireCsrfProtectionMatcher(request -> "POST".equalsIgnoreCase(request.getMethod()))//只对post 使用
+        ;
         http.authenticationProvider(emailCodeProvider());
     }
 
