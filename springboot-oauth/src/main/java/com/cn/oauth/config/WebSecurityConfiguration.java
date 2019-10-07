@@ -5,6 +5,7 @@ import com.cn.oauth.common.PermitAllUrl;
 import com.cn.oauth.provider.EmailCodeProvider;
 import com.cn.oauth.service.SysClientDetailService;
 import com.cn.oauth.service.SysUserDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -44,6 +45,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
         return emailCodeProvider;
     }
 
+    @Autowired
+    private UserDetailsService userDetailsService;
 
 
     /**
@@ -51,7 +54,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        super.configure(auth);
+        //super.configure(auth);//不能与下面的同时使用 否则无效
+        auth.userDetailsService(userDetailsService);
+        auth.authenticationProvider(emailCodeProvider());
     }
 
     @Override
@@ -65,13 +70,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .requestMatchers().antMatchers("/auth/login","/auth/authorize","/auth/approve").anyRequest()
                 .and()
                 .authorizeRequests().antMatchers(PermitAllUrl.permitAllUrl("/auth/login","/auth/authorize","/auth/approve")).permitAll()
+                .antMatchers("/order/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
-                //禁用跨站伪造
                 .and()
-                .csrf()
-                .requireCsrfProtectionMatcher(request -> "POST".equalsIgnoreCase(request.getMethod()))//只对post 使用
         ;
-        http.authenticationProvider(emailCodeProvider());
     }
 
     /**

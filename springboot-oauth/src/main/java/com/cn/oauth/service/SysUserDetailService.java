@@ -24,7 +24,7 @@ public class SysUserDetailService implements UserDetailsService{
             //然后根据当前登录方式type 然后创建一个sysuserauthentication 重新设置 username 和 password
             //比如使用手机验证码登录的， username就是手机号 password就是6位的验证码{noop}000000
             //System.out.println(auth);
-            List<GrantedAuthority> list = AuthorityUtils.createAuthorityList("admin_role","orderById"); //所谓的角色，只是增加ROLE_前缀
+            List<GrantedAuthority> list = AuthorityUtils.createAuthorityList("ROLE_ADMIN","admin_role","orderById"); //所谓的角色，只是增加ROLE_前缀
             user = new SysUserAuthentication();
             user.setUsername(username);
             user.setPassword( new BCryptPasswordEncoder().encode("123456"));

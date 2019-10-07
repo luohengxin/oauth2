@@ -140,7 +140,7 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
                 .tokenStore(tokenStore())
-                .userDetailsService(userDetailsService)
+                //.userDetailsService(userDetailsService) 可以在authenticationManager 中配置
                 .tokenServices(tokenServices())
                 .tokenGranter(tokenGranter())
                 .tokenEnhancer(tokenEnhancer())
