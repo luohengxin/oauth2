@@ -32,14 +32,18 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
+        //super.configure(http); //不能调用该方法 会导致后面认证规则失效
         // Since we want the protected resources to be accessible in the UI as well we need
         // session creation to be allowed (it's disabled by default in 2.0.6)
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
-                .requestMatchers().anyRequest()
+                .authorizeRequests()
+                //.anyRequest().authenticated() //不能放在前
+                .antMatchers("/order/**").hasRole("USER")
+                .antMatchers("/order2/**").hasRole("ADMIN")
+                .antMatchers("/order3/**").hasAuthority("orderById")
+                .anyRequest().authenticated()
                 .and()
-                .anonymous()
-                .and();
+;
     }
 }

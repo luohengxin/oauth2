@@ -8,24 +8,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/order")
-public class OrderController {
+@RequestMapping("/order2")
+public class OrderController2 {
 
-    @PreAuthorize("hasAuthority('orderById')")
     @RequestMapping("/{id}")
+    @PreAuthorize("hasAuthority('orderById2')")
     public String findById(@PathVariable("id") String id){
         System.out.println(id);
         return id;
     }
 
-    //@PreAuthorize("hasAuthority('orderById2')")
     @RequestMapping("/2/{id}")
+    @PreAuthorize("hasAuthority('orderById')")
     public String findById2(@PathVariable("id") String id){
         System.out.println(id);
         return id;
     }
 
-    //@PreAuthorize("hasRole('ADMIN2')")
     @RequestMapping("/3/{id}")
     public String findById3(@PathVariable("id") String id){
         System.out.println(id);
