@@ -67,12 +67,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .formLogin().loginPage("/auth/login").loginProcessingUrl("/auth/authorize")
                 .and()
                 //允许访问
-                .requestMatchers().antMatchers("/auth/login","/auth/authorize","/auth/approve").anyRequest()
+                .requestMatchers().antMatchers("/auth/login","/auth/authorize","/auth/approve")//本http 对象处理的urls
                 .and()
                 .authorizeRequests().antMatchers(PermitAllUrl.permitAllUrl("/auth/login","/auth/authorize","/auth/approve")).permitAll()
                 .antMatchers("/order/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
+                .csrf()
         ;
     }
 
