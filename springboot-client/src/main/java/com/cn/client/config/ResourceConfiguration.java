@@ -68,7 +68,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 //.accessDeniedHandler() //会覆盖resources中设置的handler
-                .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())
+                .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())//可做token续签
                 .and()
                 //.addFilterBefore()//在制定位置插入过滤器 特殊场景会使用
                 .headers() //设置http 头相关参数
