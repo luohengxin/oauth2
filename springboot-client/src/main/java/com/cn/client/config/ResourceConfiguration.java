@@ -1,6 +1,9 @@
 package com.cn.client.config;
 
 
+import com.cn.client.entryPoint.InvalidTokenAuthenticationEntryPoint;
+import com.cn.client.entryPoint.NoTokenAuthenticationEntryPoint;
+import com.cn.client.handler.UserAccessDeniedHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,7 +27,10 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
         remoteTokenServices.setClientSecret("123456");
         remoteTokenServices.setTokenName("token");
         remoteTokenServices.setCheckTokenEndpointUrl("http://localhost:8080/oauth/check_token");
-        resources.tokenServices(remoteTokenServices);
+        resources.tokenServices(remoteTokenServices)
+                 .accessDeniedHandler(new UserAccessDeniedHandler())
+                 .authenticationEntryPoint(new NoTokenAuthenticationEntryPoint())
+                ;
 
     }
 
@@ -44,6 +50,10 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                 .antMatchers("/order3/**").hasAuthority("orderById")
                 .anyRequest().authenticated()
                 .and()
+                .exceptionHandling()
+                //.accessDeniedHandler() //会覆盖resources中设置的handler
+                .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())
+
 ;
     }
 }
