@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 @Configuration
 @EnableResourceServer
@@ -29,6 +31,11 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
         remoteTokenServices.setTokenName("token");
         remoteTokenServices.setCheckTokenEndpointUrl("http://localhost:8080/oauth/check_token");
         return remoteTokenServices;
+    }
+
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository(){
+        return new HttpSessionCsrfTokenRepository();
     }
 
 
@@ -62,6 +69,18 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                 .exceptionHandling()
                 //.accessDeniedHandler() //会覆盖resources中设置的handler
                 .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())
+                .and()
+                //.addFilterBefore()//在制定位置插入过滤器 特殊场景会使用
+                .headers() //设置http 头相关参数
+                .cacheControl().and()
+                .xssProtection().xssProtectionEnabled(true).and()
+                .and()
+                .csrf()
+                .requireCsrfProtectionMatcher(request -> "POST".equalsIgnoreCase(request.getMethod()))
+                .csrfTokenRepository(csrfTokenRepository())
+
+
+
 
 ;
     }
