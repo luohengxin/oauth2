@@ -4,6 +4,7 @@ package com.cn.client.config;
 import com.cn.client.entryPoint.InvalidTokenAuthenticationEntryPoint;
 import com.cn.client.entryPoint.NoTokenAuthenticationEntryPoint;
 import com.cn.client.handler.UserAccessDeniedHandler;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 
 @Configuration
 @EnableResourceServer
@@ -19,15 +21,22 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
     private static final String DEMO_RESOURCE_ID = "order";
 
-    @Override
-    public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.resourceId(DEMO_RESOURCE_ID).stateless(true);
+    @Bean
+    public ResourceServerTokenServices tokenService(){
         RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
         remoteTokenServices.setClientId("client");
         remoteTokenServices.setClientSecret("123456");
         remoteTokenServices.setTokenName("token");
         remoteTokenServices.setCheckTokenEndpointUrl("http://localhost:8080/oauth/check_token");
-        resources.tokenServices(remoteTokenServices)
+        return remoteTokenServices;
+    }
+
+
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) {
+        resources.resourceId(DEMO_RESOURCE_ID)
+                 .stateless(true)
+                 .tokenServices(tokenService())
                  .accessDeniedHandler(new UserAccessDeniedHandler())
                  .authenticationEntryPoint(new NoTokenAuthenticationEntryPoint())
                 ;
