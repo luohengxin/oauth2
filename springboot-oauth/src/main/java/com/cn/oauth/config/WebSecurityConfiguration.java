@@ -14,11 +14,14 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.*;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
 
 @Configuration
@@ -48,6 +51,15 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Bean
+    public PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider(){
+        AuthenticationUserDetailsService authenticationUserDetailsService = new UserDetailsByNameServiceWrapper(userDetailsService);
+        PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider = new PreAuthenticatedAuthenticationProvider();
+        preAuthenticatedAuthenticationProvider.setPreAuthenticatedUserDetailsService(authenticationUserDetailsService);
+        return preAuthenticatedAuthenticationProvider;
+    }
+
+
 
     /**
      * 用户验证
@@ -57,6 +69,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
         //super.configure(auth);//不能与下面的同时使用 否则无效
         auth.userDetailsService(userDetailsService);
         auth.authenticationProvider(emailCodeProvider());
+        auth.authenticationProvider(preAuthenticatedAuthenticationProvider()); //refresh_token 会使用
     }
 
     @Override
