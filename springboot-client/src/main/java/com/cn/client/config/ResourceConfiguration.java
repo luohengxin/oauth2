@@ -9,11 +9,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
@@ -21,7 +24,9 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 @EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
+
     private static final String DEMO_RESOURCE_ID = "order";
+
 
     @Bean
     public ResourceServerTokenServices tokenService(){
@@ -45,7 +50,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                  .stateless(true)
                  .tokenServices(tokenService())
                  .accessDeniedHandler(new UserAccessDeniedHandler())
-                 .authenticationEntryPoint(new NoTokenAuthenticationEntryPoint())
+                 .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())
                 ;
 
     }
@@ -68,7 +73,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 //.accessDeniedHandler() //会覆盖resources中设置的handler
-                .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())//可做token续签
+                .authenticationEntryPoint(new NoTokenAuthenticationEntryPoint())//可做token续签
                 .and()
                 //.addFilterBefore()//在制定位置插入过滤器 特殊场景会使用
                 .headers() //设置http 头相关参数
