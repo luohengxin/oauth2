@@ -2,21 +2,18 @@ package com.cn.client.config;
 
 
 import com.cn.client.entryPoint.InvalidTokenAuthenticationEntryPoint;
-import com.cn.client.entryPoint.NoTokenAuthenticationEntryPoint;
+import com.cn.client.entryPoint.NoTokenOrAuthenticationExceptionEntryPoint;
 import com.cn.client.handler.UserAccessDeniedHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
@@ -29,7 +26,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
 
 
     @Bean
-    public ResourceServerTokenServices tokenService(){
+    public ResourceServerTokenServices tokenService() {
         RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
         remoteTokenServices.setClientId("client");
         remoteTokenServices.setClientSecret("123456");
@@ -39,7 +36,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
     }
 
     @Bean
-    public CsrfTokenRepository csrfTokenRepository(){
+    public CsrfTokenRepository csrfTokenRepository() {
         return new HttpSessionCsrfTokenRepository();
     }
 
@@ -47,14 +44,14 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         resources.resourceId(DEMO_RESOURCE_ID)
-                 .stateless(true)
-                 .tokenServices(tokenService())
-                 .accessDeniedHandler(new UserAccessDeniedHandler())
-                 .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())
-                ;
+                .stateless(true)
+                .tokenServices(tokenService())
+                .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())// 用于OAuth2AuthenticationProcessingFilter
+                //.accessDeniedHandler(new UserAccessDeniedHandler()) //不建议配置在这
+                .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())
+        ;
 
     }
-
 
 
     @Override
@@ -65,15 +62,14 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
                 .authorizeRequests()
-                //.anyRequest().authenticated() //不能放在前
                 .antMatchers("/order/**").hasRole("USER")
                 .antMatchers("/order2/**").hasRole("ADMIN")
                 .antMatchers("/order3/**").hasAuthority("orderById")
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
-                //.accessDeniedHandler() //会覆盖resources中设置的handler
-                .authenticationEntryPoint(new NoTokenAuthenticationEntryPoint())//可做token续签
+                .accessDeniedHandler(new UserAccessDeniedHandler()) //会覆盖resources中设置的handler 用于 ExceptionTranslationFilter
+                .authenticationEntryPoint(new NoTokenOrAuthenticationExceptionEntryPoint())//用于没有token 或者 账号异常 一般直接重定向到登录页面
                 .and()
                 //.addFilterBefore()//在制定位置插入过滤器 特殊场景会使用
                 .headers() //设置http 头相关参数
@@ -85,8 +81,6 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                 .csrfTokenRepository(csrfTokenRepository())
 
 
-
-
-;
+        ;
     }
 }

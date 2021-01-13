@@ -12,7 +12,6 @@ public class UserAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         System.out.println("没有权限");
-        System.out.println(accessDeniedException.getCause());
-        //需要重定向或返回数据
+        //向页面返回错误的信息，或者直接重定向到 错误页面
     }
 }

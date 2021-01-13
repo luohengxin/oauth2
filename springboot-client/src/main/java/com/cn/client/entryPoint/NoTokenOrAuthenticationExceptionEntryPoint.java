@@ -8,11 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class NoTokenAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class NoTokenOrAuthenticationExceptionEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        System.out.println("没有access_token");
-        System.out.println(authException.getCause());
-        //需要重定向或返回数据
+        // 没有token  或者 账号异常 需要重新的登录 重定向到登录页面
+        response.sendRedirect("");
     }
 }
