@@ -26,7 +26,8 @@ public class InvalidTokenAuthenticationEntryPoint extends OAuth2AuthenticationEn
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         // token过期 或错误 重定向到登录页面
-        response.sendRedirect("");
+        System.out.printf("token过期");
+        response.getWriter().write("token过期");
 
 
     }

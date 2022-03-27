@@ -13,5 +13,7 @@ public class UserAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         System.out.println("没有权限");
         //向页面返回错误的信息，或者直接重定向到 错误页面
+        response.getWriter().write("403");
+
     }
 }

@@ -47,8 +47,7 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                 .stateless(true)
                 .tokenServices(tokenService())
                 .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())// 用于OAuth2AuthenticationProcessingFilter
-                //.accessDeniedHandler(new UserAccessDeniedHandler()) //不建议配置在这
-                .authenticationEntryPoint(new InvalidTokenAuthenticationEntryPoint())
+                .accessDeniedHandler(new UserAccessDeniedHandler()) //不建议配置在这
         ;
 
     }
@@ -67,10 +66,10 @@ public class ResourceConfiguration extends ResourceServerConfigurerAdapter {
                 .antMatchers("/order3/**").hasAuthority("orderById")
                 .anyRequest().authenticated()
                 .and()
-                .exceptionHandling()
-                .accessDeniedHandler(new UserAccessDeniedHandler()) //会覆盖resources中设置的handler 用于 ExceptionTranslationFilter
-                .authenticationEntryPoint(new NoTokenOrAuthenticationExceptionEntryPoint())//用于没有token 或者 账号异常 一般直接重定向到登录页面
-                .and()
+                //.exceptionHandling()
+                //.accessDeniedHandler(new UserAccessDeniedHandler()) //会覆盖resources中设置的handler 用于 ExceptionTranslationFilter
+                //.authenticationEntryPoint(new NoTokenOrAuthenticationExceptionEntryPoint())//会覆盖resources中设置的handler  用于没有token 或者 账号异常 一般直接重定向到登录页面
+                //.and()
                 //.addFilterBefore()//在制定位置插入过滤器 特殊场景会使用
                 .headers() //设置http 头相关参数
                 .cacheControl().and()
