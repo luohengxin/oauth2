@@ -2,6 +2,7 @@ package com.cn.oauth.config;
 
 
 import com.cn.oauth.common.PermitAllUrl;
+import com.cn.oauth.handler.AuthSuccessHandler;
 import com.cn.oauth.provider.EmailCodeProvider;
 import com.cn.oauth.service.SysClientDetailService;
 import com.cn.oauth.service.SysUserDetailService;
@@ -49,6 +50,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
     }
 
     @Autowired
+    private AuthSuccessHandler authSuccessHandler;
+
+    @Autowired
     private UserDetailsService userDetailsService;
 
     @Bean
@@ -77,16 +81,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter{
 
         http
                 //表单登录,loginPage为登录请求的url,loginProcessingUrl为表单登录处理的URL
-                .formLogin().loginPage("/auth/login").loginProcessingUrl("/auth/authorize")
+                .formLogin().loginPage("/auth/login.html").loginProcessingUrl("/login.do")
+                //.successHandler(authSuccessHandler) //登录成功后的处理handler
                 .and()
-                //允许访问
-                .requestMatchers().antMatchers("/auth/login","/auth/authorize","/auth/approve")//本http 对象处理的urls
-                .and()
-                .authorizeRequests().antMatchers(PermitAllUrl.permitAllUrl("/auth/login","/auth/authorize","/auth/approve")).permitAll()
+                .authorizeRequests().antMatchers(PermitAllUrl.permitAllUrl("/auth/login.html","/login.do","/auth/approve")).permitAll()
                 .antMatchers("/order/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
-                .csrf()
+                .csrf().disable()
         ;
     }
 

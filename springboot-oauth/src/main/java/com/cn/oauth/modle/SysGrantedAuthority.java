@@ -22,6 +22,7 @@ public class SysGrantedAuthority implements GrantedAuthority, Serializable {
      * 权限
      * @return authority
      */
+    @Override
     public String getAuthority() {
         return authority;
     }

@@ -12,8 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 public class AuthPageController {
 
 
-    @RequestMapping("/login")
-    public ModelAndView requireAuthentication(@RequestParam String returnUrl) {
+    @RequestMapping("/login.html")
+    public ModelAndView requireAuthentication(@RequestParam(required = false) String returnUrl) {
         ModelAndView modelAndView = new ModelAndView("/oauth/login");
         modelAndView.addObject("returnUrl",returnUrl);
         return modelAndView;
